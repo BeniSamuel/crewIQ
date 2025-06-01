@@ -6,6 +6,8 @@ import com.workers.www.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,17 @@ public class UserService {
 
     public User getUserById (Long id) {
         return this.userRepository.getUserById(id).orElse(null);
+    }
+
+    public User getCurrentUser () {
+        String username;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return this.getUserByEmail(username);
     }
 
     public User createUser (RegisterUserDto registerUserDto) {
