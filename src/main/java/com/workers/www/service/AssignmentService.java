@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,8 +38,8 @@ public class AssignmentService {
         return this.assignmentRepository.getAssignmentsByStatus(status, pageable);
     }
 
-    public List<Assignment> searchAssignment (AssignmentStatus status, Role role) {
-        return this.assignmentRepository.findAll(Sort.by(status.name(), role.name()));
+    public List<Assignment> searchAssignment(AssignmentStatus status, Role role) {
+        return assignmentRepository.findByStatusAndRole(status, role);
     }
 
     public Assignment getAssignmentById (Long id) {
