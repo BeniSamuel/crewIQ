@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/workers/users")
+@RequestMapping("/api/workers/user")
 @AllArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -40,7 +40,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Failed to obtain user!!!", null));
     }
 
-    @PutMapping("/put/{id}")
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<User>> getCurrentUser () {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Successfully obtained current user", this.userService.getCurrentUser()));
+    }
+
+    @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<User>> updateUserById (@PathVariable Long id, @RequestBody RegisterUserDto registerUserDto) {
         User user = this.userService.updateUserById(id, registerUserDto);
         if (user != null) {
@@ -48,4 +53,5 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Failed to update user!!!", null));
     }
+
 }

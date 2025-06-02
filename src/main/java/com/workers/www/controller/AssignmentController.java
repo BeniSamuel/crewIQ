@@ -75,4 +75,13 @@ public class AssignmentController {
                ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Failed to delete assignment not found", false)); 
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<Assignment>> createAssignment (@RequestBody CreateAssignmentDto createAssignmentDto) {
+        Assignment assignment = this.assignmentService.createAssignment(createAssignmentDto);
+        if (assignment != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Successfully created assignment", assignment));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, "Failed due to bad request body check inform", null));
+    }
+
 }
