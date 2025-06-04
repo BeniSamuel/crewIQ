@@ -1,5 +1,6 @@
 package com.workers.www.service;
 
+import com.workers.www.dto.ForgotPasswordDto;
 import com.workers.www.dto.LoginUserDto;
 import com.workers.www.dto.RegisterUserDto;
 import com.workers.www.model.User;
@@ -11,14 +12,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 @Service
 @AllArgsConstructor
 public class AuthService {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
     private final JwtUtil jwtUtil;
+
 
     public User registerUser (RegisterUserDto registerUserDto) {
         return this.userService.createUser(registerUserDto);
@@ -35,5 +42,30 @@ public class AuthService {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, "Failed to log in user", null));
         }
+    }
+
+    private String generateRandomString(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            result.append(characters.charAt(index));
+        }
+
+        return result.toString();
+    }
+
+    public Boolean resetPassword (ForgotPasswordDto forgotPasswordDto) {
+        User user = this.userService.getUserByEmail(forgotPasswordDto.getEmail());
+        if (user != null) {
+            String password = generateRandomString(9);
+            user.setPassword(passwordEncoder.encode(password));
+
+            mailService.sendEmail(forgotPasswordDto.getEmail(), "Resetting Password", password);
+            return true;
+        }
+        return false;
     }
 }

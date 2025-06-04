@@ -15,7 +15,7 @@ public class MailService {
         message.setFrom("benisamuel566@gmail.com");
         message.setTo(toEmail);
         message.setSubject(subject);
-        message.setText(body);
+        message.setText("New password: " + body);
 
         mailSender.send(message);
     }
